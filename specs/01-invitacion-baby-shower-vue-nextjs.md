@@ -1,6 +1,6 @@
 # SPEC 01 — Invitación de baby shower con Vue y API en Next.js
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** Ninguna
 > **Date:** 2026-09-18
 > **Objective:** Construir la invitación web del baby shower de Aria Natasha con un frontend Vue 3 basado en `resources/` y un backend Next.js que guarda las confirmaciones de asistencia en Supabase (Postgres) y las muestra en un panel admin protegido por clave.
@@ -20,7 +20,8 @@ Es el inicio del proyecto. Hoy solo existe un prototipo en `resources/Invitacion
 - Backend en `backend/` con Next.js usado solo como API (route handlers), sin páginas.
 - Endpoint público para registrar una confirmación (nombre, acompañantes, mensaje opcional).
 - Persistencia en Supabase usado solo como Postgres, con acceso únicamente desde el servidor de Next.js.
-- Ruta `/admin` en el frontend: listado de confirmaciones, total de asistentes y envío de notificacion por telegram cada que alguien confirma, protegida por una contraseña única.
+- Ruta `/admin` en el frontend: listado de confirmaciones y total de asistentes, protegida por una contraseña única.
+- Base de la notificación por Telegram: módulo `backend/lib/telegram.js` que envía un mensaje simple cuando alguien confirma, y variables de entorno opcionales. Si no están configuradas, se omite el envío sin error. La configuración precisa (creación del bot, formato del mensaje, reintentos) se define en otro spec.
 - Configuración local: archivos `.env.example`, `README.md` raíz con comandos de arranque.
 
 **Fuera de alcance (para specs futuros):**
@@ -30,6 +31,7 @@ Es el inicio del proyecto. Hoy solo existe un prototipo en `resources/Invitacion
 - Bloqueo de duplicados por nombre.
 - Campos de teléfono o correo en el formulario.
 - Notificaciones por correo o WhatsApp al recibir una confirmación.
+- Configuración precisa de Telegram: creación del bot, formato final del mensaje, reintentos y manejo avanzado de errores.
 - Múltiples eventos o multi-idioma.
 - Los design systems `industry` y `nocturne` de `resources/_ds`.
 - Pruebas automatizadas end-to-end.
@@ -82,7 +84,8 @@ Convenciones:
 
 - `guests` es el número de acompañantes. Cada fila cuenta como `1 + guests` asistentes en `totalAttendees`.
 - El campo `website` es un honeypot: si llega con contenido, la API responde `201` sin guardar nada.
-- Variables de entorno de `backend/.env.local`: `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `ADMIN_PASSWORD`, `FRONTEND_ORIGIN`.
+- Variables de entorno de `backend/.env.local`: `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `ADMIN_PASSWORD`, `FRONTEND_ORIGIN`, y las opcionales `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID`.
+- Telegram es "mejor esfuerzo": `backend/lib/telegram.js` llama a la API de bots de Telegram (`sendMessage`) tras guardar la fila. Si faltan las variables o el envío falla, el `POST /api/rsvp` sigue respondiendo `201`. Nunca se envía en peticiones con honeypot ni inválidas.
 - Variable de `invitación_baby_shower_nat/.env`: `VITE_API_URL`.
 - La clave de servicio de Supabase nunca se expone al frontend.
 
@@ -93,7 +96,7 @@ Convenciones:
 3. Agregar `RsvpSection.vue` con el formulario (nombre, acompañantes 0–8, mensaje, honeypot oculto) y los estados "sin enviar", "enviando", "enviado" y "error". Por ahora el envío se simula sin llamar a la red. Prueba manual: enviar muestra "¡Gracias, te esperamos!" y "Enviar otra respuesta" reinicia el formulario.
 4. Agregar los componentes de imagen para foto y ultrasonido, que leen `event.photo` y `event.ultrasound` desde `invitación_baby_shower_nat/public/img/` y muestran el placeholder punteado si la imagen falla (`@error`). Prueba manual: sin imágenes se ve el placeholder; con imágenes se ven las reales.
 5. Implementar `invitación_baby_shower_nat/src/utils/calendar.js` (genera el texto `.ics` con `BEGIN:VEVENT`, `DTSTART` local, `SUMMARY`, `LOCATION`) y conectar el botón "Agregar al calendario" para descargar `baby-shower-aria.ics`. Prueba manual: el archivo abre en un cliente de calendario con la fecha y hora correctas.
-6. Crear `backend/` con Next.js (solo `app/api/`), `.env.example`, cliente de Supabase en `backend/lib/supabase.js` y `backend/supabase/schema.sql`. Implementar `POST /api/rsvp` con validación y honeypot, y CORS limitado a `FRONTEND_ORIGIN`. Prueba manual: un `curl` válido devuelve `201` y la fila aparece en Supabase; uno inválido devuelve `400`.
+6. Crear `backend/` con Next.js (solo `app/api/`), `.env.example`, cliente de Supabase en `backend/lib/supabase.js` y `backend/supabase/schema.sql`. Implementar `POST /api/rsvp` con validación y honeypot, y CORS limitado a `FRONTEND_ORIGIN`. Agregar `backend/lib/telegram.js` (base de la notificación, mensaje simple con nombre y acompañantes) y llamarlo tras guardar la fila. Prueba manual: un `curl` válido devuelve `201` y la fila aparece en Supabase; uno inválido devuelve `400`; sin variables de Telegram sigue devolviendo `201`; con ellas llega un mensaje al chat.
 7. Conectar el formulario del frontend a `POST /api/rsvp` mediante `invitación_baby_shower_nat/src/api/rsvp.js` usando `VITE_API_URL`. Prueba manual: enviar el formulario crea una fila real; con el backend apagado se muestra el estado de error con opción de reintentar.
 8. Implementar en el backend `GET /api/rsvps` y `GET /api/rsvps/export` con la verificación `Authorization: Bearer <ADMIN_PASSWORD>` en `backend/lib/auth.js`. Prueba manual: sin header o con clave errónea devuelven `401`; con la clave correcta devuelven datos y un CSV descargable.
 9. Agregar `views/AdminView.vue` en la ruta `/admin` con pantalla de clave, tabla de confirmaciones, total de asistentes y botón "Exportar CSV". La clave se guarda solo en `sessionStorage`. Prueba manual: entrar con la clave correcta lista lo enviado en el paso 7.
@@ -112,11 +115,13 @@ Convenciones:
 - [ ] Enviar con nombre vacío, `guests` fuera de 0–8 o mensaje de más de 500 caracteres no crea fila y muestra un mensaje de error en el formulario.
 - [ ] Un envío con el campo honeypot `website` con texto responde `201` y no crea fila.
 - [ ] Con el backend apagado, el formulario muestra un error y conserva lo escrito.
+- [ ] Con `TELEGRAM_BOT_TOKEN` y `TELEGRAM_CHAT_ID` configurados, una confirmación válida envía un mensaje a Telegram; sin ellos, o si Telegram falla, la API responde `201` igualmente.
+- [ ] Los tokens de Telegram no aparecen en el frontend ni en el bundle.
 - [ ] `GET /api/rsvps` sin header `Authorization` o con clave incorrecta responde `401`.
 - [ ] `/admin` con la clave correcta lista las confirmaciones, y `totalAttendees` es igual a la suma de `1 + guests` de todas las filas.
 - [ ] "Exportar CSV" descarga un archivo con una fila por confirmación y encabezados `name,guests,message,created_at`.
 - [ ] Una petición desde un origen distinto a `FRONTEND_ORIGIN` es rechazada por CORS.
-- [ ] `SUPABASE_SERVICE_KEY` no aparece en ningún archivo bajo `frontend/` ni en el bundle de `npm run build`.
+- [ ] `SUPABASE_SERVICE_KEY` no aparece en ningún archivo bajo `invitación_baby_shower_nat/` ni en el bundle de `npm run build`.
 - [ ] Seguir el `README.md` desde un clon limpio permite levantar ambas apps.
 
 ## Decisiones
@@ -135,6 +140,7 @@ Convenciones:
 - **Sí:** Imágenes estáticas en `invitación_baby_shower_nat/public/img/`, con placeholder de respaldo. Permite que el proyecto corra antes de tener las fotos.
 - **Sí (por defecto, no confirmado):** JavaScript sin TypeScript, para mantener el arranque simple. Cambiarlo antes de implementar si se prefiere TypeScript.
 - **Sí (por defecto, no confirmado):** El `.ics` usa hora local flotante sin zona, y no incluye `DTEND`. El evento no tiene hora de fin definida.
+- **Sí:** Solo la base de Telegram en este spec (módulo, variables opcionales, envío de mejor esfuerzo). La configuración precisa va en otro spec.
 - **Sí:** Solo desarrollo local en este spec. El despliegue se decide en otro spec.
 - **No:** Dividir este trabajo en varios specs. Toca frontend, API y panel admin (tres áreas), y cada paso es pequeño; dividirlo agregaría trámite sin reducir riesgo.
 

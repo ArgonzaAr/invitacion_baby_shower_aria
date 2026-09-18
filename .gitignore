@@ -40,3 +40,9 @@ __screenshots__/
 
 #Cascaron
 /resources/*
+# Variables de entorno (se versiona solo .env.example)
+.env*
+!.env.example
+
+# Next.js
+.next

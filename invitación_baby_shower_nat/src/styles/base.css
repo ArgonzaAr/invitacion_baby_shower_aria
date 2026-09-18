@@ -1,0 +1,18 @@
+:root {
+  --color-bg: #fdf6f8; --color-surface: #fff; --color-text: #2a1c22;
+  --color-accent: #d3376d; --color-divider: color-mix(in srgb, #2a1c22 22%, transparent);
+  --color-accent-100: #fdeff4; --color-accent-200: #fbdbe6; --color-accent-300: #f5b8cd;
+  --color-accent-400: #e87aa3; --color-accent-500: #d3376d; --color-accent-600: #b62a5b;
+  --color-accent-700: #911f48; --color-accent-800: #6c1637; --color-accent-900: #4a1027;
+  --font-baby: "Baloo 2", "Archivo", sans-serif;
+}
+body {
+  margin: 0; color: var(--color-text);
+  background-color: #fdf6f8;
+  background-image: radial-gradient(#f5b8cd 2.2px, transparent 2.2px), radial-gradient(#fbdbe6 2.2px, transparent 2.2px);
+  background-size: 38px 38px, 38px 38px;
+  background-position: 0 0, 19px 19px;
+}
+a { color: var(--color-accent-700); }
+a:hover { color: var(--color-accent); }
+@keyframes floatUp { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
