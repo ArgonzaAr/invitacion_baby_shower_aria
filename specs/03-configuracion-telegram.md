@@ -1,6 +1,6 @@
 # SPEC 03 — Configuración de las notificaciones por Telegram
 
-> **Status:** Borrador
+> **Status:** Aprobado
 > **Depends on:** SPEC 01, SPEC 02
 > **Date:** 2026-09-18
 > **Objective:** Crear el bot y el grupo de Telegram, completar `backend/lib/telegram.js` (mensaje con nombre, acompañantes, mensaje y total acumulado; un reintento y log de errores) y comprobar en local que cada confirmación real llega al grupo.
@@ -38,7 +38,7 @@ TELEGRAM_BOT_TOKEN=<token entregado por @BotFather>
 TELEGRAM_CHAT_ID=<ID negativo del grupo, por ejemplo -1001234567890>
 ```
 
-Formato del mensaje (texto plano, sin `parse_mode`, para no escapar el contenido escrito por el invitado):
+Formato del mensaje (texto plano, sin `parse_mode`, para no escapar el contenido escrito por el invitado, toma en cuenta los emojis en dado caso de que el invitado coloque):
 
 ```
 Nueva confirmación

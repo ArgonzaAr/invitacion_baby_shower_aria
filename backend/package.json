@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "check:supabase": "node --env-file=.env.local scripts/check-supabase.js"
+    "check:supabase": "node --env-file=.env.local scripts/check-supabase.js",
+    "check:telegram": "node --env-file=.env.local scripts/check-telegram.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.116.0",

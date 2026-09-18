@@ -30,7 +30,7 @@ Copia `backend/.env.example` a `backend/.env.local` y completa:
 | `TELEGRAM_BOT_TOKEN` | Opcional. Token del bot de Telegram. |
 | `TELEGRAM_CHAT_ID` | Opcional. Chat que recibe los avisos. |
 
-Si faltan las dos variables de Telegram, simplemente no se envía el aviso.
+Si faltan las dos variables de Telegram, simplemente no se envía el aviso. Ver [Configurar Telegram](#configurar-telegram).
 
 ### Frontend: `invitación_baby_shower_nat/.env`
 
@@ -61,6 +61,42 @@ Pasos para dejar el backend conectado a un proyecto de Supabase real:
 2. En <http://localhost:5173> envía el formulario. Debe aparecer "¡Gracias, te esperamos!" y una fila nueva en Supabase (Table Editor).
 3. En <http://localhost:5173/admin> entra con `ADMIN_PASSWORD`: la confirmación aparece en la lista, el total de asistentes suma `1 + acompañantes` por fila y "Exportar CSV" descarga un archivo con `name,guests,message,created_at`.
 4. Borra las filas de prueba (por ejemplo, con nombres que empiecen por `[PRUEBA]`) antes de compartir la invitación.
+
+## Configurar Telegram
+
+Cada confirmación envía un aviso a un grupo de Telegram (tú y tu pareja). Pasos:
+
+1. **Crear el bot y el grupo.**
+   - En Telegram habla con **@BotFather**, envía `/newbot` y sigue las instrucciones. Te entrega un token: guárdalo, es secreto.
+   - Crea un grupo con tu pareja, agrega el bot y escribe un mensaje en el grupo.
+   - Abre `https://api.telegram.org/bot<TOKEN>/getUpdates` en el navegador (sustituye `<TOKEN>`). Busca `"chat":{"id":-...` : ese número **negativo** es el ID del grupo. No compartas la URL ni el token.
+2. **Completar `backend/.env.local`:**
+
+   ```
+   TELEGRAM_BOT_TOKEN=<token de @BotFather>
+   TELEGRAM_CHAT_ID=<ID negativo del grupo, por ejemplo -1001234567890>
+   ```
+
+   Reinicia el backend para que tome los cambios.
+3. **Verificar la configuración:**
+
+   ```bash
+   cd backend
+   npm run check:telegram
+   ```
+
+   Si todo está bien imprime `OK: bot @<usuario> conectado y mensaje de prueba enviado al grupo.` y el mensaje llega al grupo. Si falla, imprime el error de Telegram (token inválido, bot fuera del grupo, ID de chat incorrecto) y termina con código distinto de cero. El script nunca imprime credenciales.
+
+Formato del aviso (texto plano; `Mensaje` solo aparece si el invitado escribió algo):
+
+```
+Nueva confirmación
+Ana López (+2)
+Mensaje: ¡Felicidades!
+Total: 14 asistentes
+```
+
+Si el envío falla, se reintenta una vez; si también falla, la confirmación queda guardada igualmente y el error se registra en la consola del backend sin el token. Si el grupo se convierte en supergrupo su ID cambia: vuelve a obtenerlo con `getUpdates` y actualiza `TELEGRAM_CHAT_ID`.
 
 ## 3. Imágenes (opcional)
 
