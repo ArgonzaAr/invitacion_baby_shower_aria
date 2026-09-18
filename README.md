@@ -40,6 +40,28 @@ Copia `invitación_baby_shower_nat/.env.example` a `.env`:
 | --- | --- |
 | `VITE_API_URL` | URL del backend. En local: `http://localhost:3000`. |
 
+## Configurar Supabase
+
+Pasos para dejar el backend conectado a un proyecto de Supabase real:
+
+1. **Crear la tabla.** En Supabase abre **SQL Editor**, pega el contenido completo de [`backend/supabase/schema.sql`](backend/supabase/schema.sql) y ejecútalo. Además de crear `rsvps`, activa RLS sin políticas: la anon key no puede leer ni escribir, solo la clave de servicio. En **Table Editor** debe aparecer `rsvps` con RLS activado.
+2. **Completar `backend/.env.local`.** Deben estar definidas `SUPABASE_URL`, `SUPABASE_SERVICE_KEY` (la clave `service_role`, no la anon), `ADMIN_PASSWORD` (la eliges tú) y `FRONTEND_ORIGIN=http://localhost:5173`. No compartas estos valores ni los subas a git: `.env.local` está ignorado.
+3. **Verificar la conexión:**
+
+   ```bash
+   cd backend
+   npm run check:supabase
+   ```
+
+   Si todo está bien imprime `OK: conexión correcta y tabla rsvps disponible (N filas).` Si falla, muestra el error de Supabase (por ejemplo, tabla inexistente o clave anon en lugar de `service_role`). El script nunca imprime credenciales.
+
+### Prueba end-to-end en local
+
+1. Levanta backend y frontend (sección 4).
+2. En <http://localhost:5173> envía el formulario. Debe aparecer "¡Gracias, te esperamos!" y una fila nueva en Supabase (Table Editor).
+3. En <http://localhost:5173/admin> entra con `ADMIN_PASSWORD`: la confirmación aparece en la lista, el total de asistentes suma `1 + acompañantes` por fila y "Exportar CSV" descarga un archivo con `name,guests,message,created_at`.
+4. Borra las filas de prueba (por ejemplo, con nombres que empiecen por `[PRUEBA]`) antes de compartir la invitación.
+
 ## 3. Imágenes (opcional)
 
 Coloca las imágenes en `invitación_baby_shower_nat/public/img/`:

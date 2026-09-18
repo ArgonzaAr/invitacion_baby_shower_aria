@@ -5,3 +5,6 @@ create table rsvps (
   message     text check (char_length(message) <= 500),
   created_at  timestamptz not null default now()
 );
+
+alter table rsvps enable row level security;
+-- Sin políticas: la anon key no puede leer ni escribir; solo la service key (que omite RLS).
