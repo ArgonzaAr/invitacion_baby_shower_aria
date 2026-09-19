@@ -61,15 +61,13 @@ function reset() {
 
 <template>
   <section style="padding:34px 0 0">
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:32px;align-items:start">
-      <div>
-        <h2 style="font-family:var(--font-baby);font-weight:800;font-size:clamp(26px,4vw,40px);margin:0 0 14px;max-width:20ch;line-height:1.1">Confírmanos antes del {{ event.rsvpDeadline }}.</h2>
+    <h2 style="font-family:var(--font-baby);font-weight:800;font-size:clamp(26px,4vw,40px);margin:0 0 20px;max-width:20ch;line-height:1.1">Confírmanos antes del {{ event.rsvpDeadline }}.</h2>
 
-        <UltrasoundImage />
-      </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:32px;align-items:stretch">
+      <UltrasoundImage />
 
-      <div v-if="status === 'sent'" style="border:2px solid var(--color-accent);background:var(--color-accent-100);border-radius:24px;padding:26px 22px">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:10px"><path d="M9 12h.01"></path><path d="M15 12h.01"></path><path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"></path><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5.5 3.5.5"></path></svg>
+      <div v-if="status === 'sent'" style="border:2px solid var(--color-accent);background:var(--color-accent-100);border-radius:24px;padding:26px 22px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;box-sizing:border-box">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:10px"><path d="M9.5 13h.01"></path><path d="M14.5 13h.01"></path><path d="M10.3 16.6c.5.3 1.1.4 1.7.4s1.2-.1 1.7-.4"></path><path d="M4.6 11.5a2 2 0 0 0 0 3.2 8 8 0 0 0 14.8 0 2 2 0 0 0 0-3.2A8 8 0 0 0 12 7.3a8 8 0 0 0-7.4 4.2Z"></path><path d="M12 7.3c0-1.2 0-2 .4-2.6"></path><path d="M12.4 4.7C13 3 15 2 16.6 3.2c1.2 1 .6 2.5-.6 2.9-1.4.5-3.2-.1-3.6-1.4Z" fill="var(--color-accent)" fill-opacity=".25"></path><path d="M12.4 4.7C11.8 3 9.8 2 8.2 3.2c-1.2 1-.6 2.5.6 2.9 1.4.5 3.2-.1 3.6-1.4Z" fill="var(--color-accent)" fill-opacity=".25"></path></svg>
         <h3 style="margin:0 0 8px;font-family:var(--font-baby);font-weight:800;font-size:26px;color:var(--color-accent-800)">¡Gracias, te esperamos!</h3>
         <p style="margin:0 0 16px;font-size:15px">Tu confirmación quedó registrada.</p>
         <button class="btn btn-secondary" type="button" style="border-radius:999px;min-height:44px" @click="reset">Enviar otra respuesta</button>
