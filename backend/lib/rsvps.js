@@ -9,9 +9,9 @@ export async function listRsvps() {
   return data
 }
 
-// Cada fila cuenta como 1 + guests asistentes.
+// guests es el total de asistentes de la fila (incluye a quien confirma).
 export function totalAttendees(items) {
-  return items.reduce((sum, row) => sum + 1 + row.guests, 0)
+  return items.reduce((sum, row) => sum + row.guests, 0)
 }
 
 function csvCell(value) {

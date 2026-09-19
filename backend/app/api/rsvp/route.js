@@ -12,8 +12,8 @@ function validate(body) {
   const name = typeof body.name === 'string' ? body.name.trim() : ''
   if (name.length < 1 || name.length > 120) return { error: 'name_required' }
 
-  const guests = body.guests ?? 0
-  if (!Number.isInteger(guests) || guests < 0 || guests > 8) return { error: 'guests_invalid' }
+  const guests = body.guests ?? 1
+  if (!Number.isInteger(guests) || guests < 1 || guests > 8) return { error: 'guests_invalid' }
 
   const rawMessage = body.message ?? ''
   if (typeof rawMessage !== 'string' || rawMessage.length > 500) return { error: 'message_too_long' }

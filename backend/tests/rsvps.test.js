@@ -2,8 +2,8 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { toCsv, totalAttendees } from '../lib/rsvps.js'
 
-test('totalAttendees cuenta al invitado más sus acompañantes', () => {
-  assert.equal(totalAttendees([{ guests: 0 }, { guests: 2 }]), 4)
+test('totalAttendees suma los asistentes totales de cada fila', () => {
+  assert.equal(totalAttendees([{ guests: 1 }, { guests: 3 }]), 4)
   assert.equal(totalAttendees([]), 0)
 })
 

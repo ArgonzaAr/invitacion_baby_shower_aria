@@ -121,7 +121,7 @@ onMounted(() => {
         <div v-else style="overflow-x:auto">
           <table class="table">
             <thead>
-              <tr><th>Nombre</th><th>Acompañantes</th><th>Mensaje</th><th>Fecha</th></tr>
+              <tr><th>Nombre</th><th>Asistentes</th><th>Mensaje</th><th>Fecha</th></tr>
             </thead>
             <tbody>
               <tr v-for="row in data.items" :key="row.id">

@@ -16,7 +16,7 @@ async function getTotal() {
 }
 
 function buildText({ name, guests, message }, total) {
-  const lines = ['Nueva confirmación', `${name} (+${guests})`]
+  const lines = ['Nueva confirmación', `${name} (${guests} asistente${guests === 1 ? '' : 's'})`]
   if (message) lines.push(`Mensaje: ${message}`)
   if (total !== null) lines.push(`Total: ${total} asistentes`)
   return lines.join('\n')

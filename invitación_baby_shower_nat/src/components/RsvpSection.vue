@@ -15,8 +15,8 @@ const sending = computed(() => status.value === 'sending')
 function validate() {
   if (!form.name.trim()) return 'Escribe tu nombre para confirmar.'
   if (form.name.trim().length > 120) return 'El nombre es demasiado largo (máximo 120 caracteres).'
-  if (!Number.isInteger(form.guests) || form.guests < 0 || form.guests > 8) {
-    return 'El número de acompañantes debe ser un entero entre 0 y 8.'
+  if (!Number.isInteger(form.guests) || form.guests < 1 || form.guests > 8) {
+    return 'El número de asistentes debe ser un entero entre 1 y 8.'
   }
   if (form.message.length > 500) return 'El mensaje es demasiado largo (máximo 500 caracteres).'
   return ''
@@ -24,7 +24,7 @@ function validate() {
 
 const API_ERRORS = {
   name_required: 'Escribe tu nombre para confirmar.',
-  guests_invalid: 'El número de acompañantes debe ser un entero entre 0 y 8.',
+  guests_invalid: 'El número de asistentes debe ser un entero entre 1 y 8.',
   message_too_long: 'El mensaje es demasiado largo (máximo 500 caracteres).',
   network: 'No pudimos conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.',
 }
@@ -79,8 +79,8 @@ function reset() {
           <input id="a-nombre" v-model="form.name" class="input" type="text" placeholder="Escribe tu nombre" autocomplete="name" :disabled="sending" style="border-radius:14px;min-height:46px;background:#fff">
         </div>
         <div class="field">
-          <label for="a-inv">Número de acompañantes</label>
-          <input id="a-inv" v-model.number="form.guests" class="input" type="number" min="0" max="8" :disabled="sending" style="border-radius:14px;min-height:46px;background:#fff">
+          <label for="a-inv">Número total de asistentes (incluyéndote)</label>
+          <input id="a-inv" v-model.number="form.guests" class="input" type="number" min="1" max="8" :disabled="sending" style="border-radius:14px;min-height:46px;background:#fff">
         </div>
         <div class="field">
           <label for="a-msg">Mensaje para la mamá <span style="opacity:.6">(opcional)</span></label>
