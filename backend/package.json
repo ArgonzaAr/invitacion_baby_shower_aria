@@ -7,12 +7,19 @@
     "build": "next build",
     "start": "next start",
     "check:supabase": "node --env-file=.env.local scripts/check-supabase.js",
-    "check:telegram": "node --env-file=.env.local scripts/check-telegram.js"
+    "check:telegram": "node --env-file=.env.local scripts/check-telegram.js",
+    "test": "node --test tests/*.test.js",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.116.0",
     "next": "^16.3.5",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.11.0",
+    "globals": "^17.12.0"
   }
 }
